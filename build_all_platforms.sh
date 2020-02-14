@@ -15,12 +15,12 @@ go tool dist list
 echo
 
 echo "Installing depedencies"
-go get github.com/logrusorgru/aurora
-go get github.com/dustin/go-humanize
-go get gonum.org/v1/plot
-go get gonum.org/v1/plot/plotter
-go get gonum.org/v1/plot/plotutil
-go get gonum.org/v1/plot/vg
+# go get github.com/logrusorgru/aurora
+# go get github.com/dustin/go-humanize
+# go get gonum.org/v1/plot
+# go get gonum.org/v1/plot/plotter
+# go get gonum.org/v1/plot/plotutil
+# go get gonum.org/v1/plot/vg
 
 TS="${TS:-`date +"%Y%m%d-%H%M%S"`}" 
 echo "Timestamp is: $TS"
