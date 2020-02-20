@@ -21,6 +21,10 @@ echo "Installing depedencies"
 # go get gonum.org/v1/plot/plotter
 # go get gonum.org/v1/plot/plotutil
 # go get gonum.org/v1/plot/vg
+#go get github.com/google/gxui
+#go get github.com/google/gxui/drivers/gl
+#go get github.com/google/gxui/themes/dark
+
 
 TS="${TS:-`date +"%Y%m%d-%H%M%S"`}" 
 echo "Timestamp is: $TS"
