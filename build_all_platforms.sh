@@ -6,12 +6,12 @@ set -o pipefail
 echo
 
 echo "Go version and enviroment"
-go version
-go env
+#go version
+#go env
 echo
 
 echo "Supported distributions:"
-go tool dist list
+#go tool dist list
 echo
 
 echo "Installing depedencies"
@@ -35,7 +35,8 @@ rm -r ./release
 mkdir -p release
 
 echo "Building Windows"
-GOOS=windows GOARCH=amd64 go build -o release/scplot-windows-x86-64-$TS.exe
+GOOS=windows GOARCH=amd64 go build -o release/scplot-windows-x86-64.exe
+#GOOS=windows GOARCH=amd64 go build -o release/scplot-windows-x86-64-$TS.exe
 # GOOS=windows GOARCH=386 go build -o release/scplot-windows-x86-32-$TS.exe
 # GOOS=windows GOARCH=arm go build -o release/scplot-windows-arm-$TS.exe
 
