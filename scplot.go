@@ -3,6 +3,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"github.com/logrusorgru/aurora"
 	"image"
@@ -11,6 +12,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"gonum.org/v1/plot"
@@ -61,25 +63,66 @@ func readFileRealRawToString(filename string) string {
 	return string(content)
 }
 
+func StringToLines(s string) (lines []string) {
+	scanner := bufio.NewScanner(strings.NewReader(s))
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	checkErr(scanner.Err())
+
+	return
+}
+
+func processDumpVariable(content string) (X []int, Y []int) {
+	for i, line := range StringToLines(content) {
+		line = strings.TrimPrefix(line, "~\"")
+		line = strings.TrimSuffix(line, "\"")
+		line = strings.TrimPrefix(line, "{")
+		line = strings.TrimPrefix(line, "}")
+		line = strings.TrimPrefix(line, ", ")
+		line = strings.TrimSpace(line)
+
+		if line != "" {
+			val, err := strconv.Atoi(line)
+			checkErr(err)
+
+			X = append(X, i)
+			Y = append(Y, val)
+		}
+	}
+	log.Println("Parsed 1D array with size of " + strconv.Itoa(len(X)))
+
+	return
+}
+
+func zipXYs(X []int, Y []int) (points plotter.XYs) {
+	points = make(plotter.XYs, len(X))
+
+	for i := range X {
+		points[i].X = float64(X[i])
+		points[i].Y = float64(Y[i])
+	}
+
+	return
+}
+
 func appMain(driver gxui.Driver) {
+	points := zipXYs(processDumpVariable(readFileRealRawToString(*inputFlag)))
+
+	// Generating and saving the plot
 	p, err := plot.New()
 	checkErr(err)
-
-	groupA := plotter.XYs{{20, 35}, {30, 35}, {27, 10}}
 
 	p.X.Label.Text = "index"
 	p.Y.Label.Text = "value"
 
-	err = plotutil.AddLinePoints(p, "", groupA)
+	err = plotutil.AddLinePoints(p, "", points)
 	checkErr(err)
-
-	// m := image.NewRGBA(image.Rect(0, 0, width, height))
-	// c := vgimg.NewWith(vgimg.UseImage(m))
-	// p.Draw(ndraw.New(c))
 
 	err = p.Save(vg.Length(*widthFlag), vg.Length(*heightFlag), pngFilename)
 	checkErr(err)
 
+	// Plot was generated (and saved), lets read it and display it
 	f, err := os.Open(pngFilename)
 	checkErr(err)
 
@@ -91,12 +134,8 @@ func appMain(driver gxui.Driver) {
 	window.SetScale(float32(*scaleFlag))
 	img := theme.CreateImage()
 
-	// texture := driver.CreateTexture(m, 1)
-	// img.SetTexture(texture)
-
 	rgba := image.NewRGBA(source.Bounds())
 	draw.Draw(rgba, source.Bounds(), source, image.ZP, draw.Src)
-	// draw.Draw(rgba, m.Bounds(), m, image.ZP, draw.Src)
 	texture := driver.CreateTexture(rgba, 1)
 	img.SetTexture(texture)
 
